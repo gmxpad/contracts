@@ -1,0 +1,46 @@
+{
+  "name": "gamexpad-contracts",
+  "version": "1.0.0",
+  "description": "Ready-to-use solid project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate-merkle-root": "ts-node scripts/merkle/generate-merkle-root.ts",
+    "generate-merkle-root:gmxp": "ts-node scripts/merkle/generate-merkle-root.ts --input libs/balances.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gmxpad/contracts.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gmxpad/contracts/issues"
+  },
+  "homepage": "https://github.com/gmxpad/contracts#readme",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@nomiclabs/hardhat-waffle": "^2.0.5",
+    "ethereum-waffle": "^4.0.10",
+    "ethereumjs-util": "^7.0.4",
+    "commander": "^6.1.0",
+    "hardhat": "^2.14.0",
+    "ethers": "^5.7.2",
+    "chai": "^4.3.7"
+  },
+  "dependencies": {
+    "@nomiclabs/hardhat-etherscan": "^3.1.8",
+    "@nomiclabs/hardhat-web3": "^2.0.0",
+    "@openzeppelin/contracts": "^5.0.1",
+    "@solidstate/contracts": "^0.0.56",
+    "hardhat-contract-sizer": "^2.8.0",
+    "@solidstate/library": "^0.0.56",
+    "hardhat-diamond-abi": "^3.0.1",
+    "@solidstate/spec": "^0.0.56",
+    "hardhat-deploy": "^0.11.37",
+    "@solidstate/abi": "^0.0.56",
+    "dotenv": "^16.0.3"
+  }
+}
