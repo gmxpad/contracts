@@ -15,7 +15,7 @@ import "../libraries/Errors.sol";
 contract Create is Modifiers, OwnableInternal {
 
     // Attention, this product is in the testing phase.
-    
+
     function createGame(
         TGame memory _params
     ) 
@@ -28,4 +28,5 @@ contract Create is Modifiers, OwnableInternal {
         gs.gameIds.push(_params.projectId);
         gs.game[_params.projectId] = _params;
     }
+
 }

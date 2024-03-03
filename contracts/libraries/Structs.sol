@@ -144,6 +144,14 @@ import { ItemType, EventType, EventRound } from "./Enums.sol";
         address nftContract;
     }
 
+    struct TGameUser {
+        bool isInvestmentor;
+        bool isRegister;
+
+        uint256 investAmount;
+        uint256 userRoundScore;
+    }
+
 
 
     

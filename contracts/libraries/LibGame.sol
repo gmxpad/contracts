@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-import { TGame } from "./Structs.sol";
+import { TGame,TGameUser } from "./Structs.sol";
 
 library LibGame {
     bytes32 internal constant STORAGE_SLOT = keccak256('storage.games.gamexpad.io');
@@ -11,7 +11,11 @@ library LibGame {
         uint256[] gameIds;
 
         mapping(uint256 => TGame) game;
-        mapping(uint256 => mapping(uint256 => bool)) user;
+        // user address             gameId            roundId
+        mapping(address => mapping( uint256 => mapping(uint256 => TGameUser))) gameUser;
+
+        address usedTokenAddress;
+        address reserveContractAddress;
     }
 
     function layout(

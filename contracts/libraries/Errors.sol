@@ -38,6 +38,7 @@ pragma solidity 0.8.20;
   error User_Refunded();
   error Sale_End();
   error Wait_For_Deposit_Times();
+  error Wait_For_Deposit_Round();
   error User_Already_Registered();
   error Not_Started_Registration();
   error End_Registration();
