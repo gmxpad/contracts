@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-import { TStakePoolInfo, TStakeTierSection, TUser,TGame, TGameUser } from "../libraries/Structs.sol";
+import { TStakePoolInfo, TStakeTierSection, TUser,TGame, TUserIpo,TGameIpo } from "../libraries/Structs.sol";
 import { LibStake } from "../libraries/LibStake.sol";
 import { LibGame } from "../libraries/LibGame.sol";
 
@@ -123,6 +123,17 @@ contract Query {
         return LibGame.layout().game[_id];
     }
 
+    function getIpo(
+        uint256 _id,
+        uint256 _round
+    ) 
+        public 
+        view 
+        returns (TGameIpo memory) 
+    {
+        return LibGame.layout().gameIpo[_id][_round];
+    }
+
     function getIpoForUser(
         uint256 _id,
         uint256 _round,
@@ -130,21 +141,9 @@ contract Query {
     ) 
         public 
         view 
-        returns (TGameUser memory) 
+        returns (TUserIpo memory) 
     {
-        return LibGame.layout().gameUser[_user][_id][_round];
-    }
-
-    function getCurrentIpoForUser(
-        uint256 _id,
-        address _user
-    ) 
-        public 
-        view 
-        returns (TGameUser memory) 
-    {
-        return LibGame.layout().gameUser[_user][_id][LibGame.layout().game[_id].round];
+        return LibGame.layout().userIpo[_user][_id][_round];
     }
    
-
 }

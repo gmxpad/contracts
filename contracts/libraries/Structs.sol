@@ -108,7 +108,7 @@ import { ItemType, EventType, EventRound } from "./Enums.sol";
         TGameSocials socials;
         TGamePlatforms platforms;
 
-        string [] genres;
+        string[] genres;
     }
 
     struct TGame {
@@ -120,36 +120,49 @@ import { ItemType, EventType, EventRound } from "./Enums.sol";
 
         uint256 projectId;
         uint256 roundCount;
-        uint256 totalUserCount;
-        uint256 totalInvestment;
+
+        address nftContract;
+    }
+
+    struct TGameIpo {
+        bool isExist;
 
         uint256 round;
-
-        uint256 minInvestment;
-        uint256 maxInvestment; // 10
+        uint256 projectIdForIpo;
+        uint256 roundUserCount;
 
         uint256 toBeCollectedInvestment;
         uint256 collectedInvestment;
 
+        uint256 minInvestment;
+        uint256 maxInvestment;
+
         uint256 perSharePrice;
         uint256 roundScore;
-        uint256 userCount;
 
-        uint256 registerStart; // 16
+        uint256 registerStart;
         uint256 registerEnd;
 
         uint256 guaranteedInvestmentStart;
         uint256 guaranteedInvestmentEnd;
 
-        address nftContract;
+        uint256 dividendValue;
     }
 
-    struct TGameUser {
+    struct TUserIpo {
         bool isInvestmentor;
         bool isRegister;
 
         uint256 investAmount;
         uint256 userRoundScore;
+    }
+
+    struct TGameStaker {
+        bool isGameStaker;
+
+        uint256 userGameMultipler;
+        uint256[] claimedRounds;
+        uint256[] claimedRoundsAmounts;
     }
 
 

@@ -126,6 +126,7 @@ interface IERC721Game {
      * See {setApprovalForAll}
      */
     function isApprovedForAll(address owner, address operator) external view returns (bool);
-
+    function burn(uint256 tokenId) external;
     function safeMint(uint256 mul,address to) external;
+    function getMultipler(uint256 tokenId) external view returns (uint256); 
 }

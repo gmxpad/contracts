@@ -67,7 +67,7 @@ const config: HardhatUserConfig = {
   diamondAbi: {
     strict: false,
     name: "DiamondABI",
-    include: ["Stake", "Query", "Settings", "Create"],
+    include: ["Stake", "Query", "Settings", "Create", "Ipo"],
     exclude: [],
   },
   etherscan: {

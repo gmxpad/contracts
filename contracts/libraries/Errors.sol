@@ -19,6 +19,7 @@ pragma solidity 0.8.20;
   error Insufficient_Balance();
   error Insufficient_Allowance();
   error Invalid_Price();
+  error Invalid_Input();
   error Invalid_Proof();
   error TokenID_Not_Found();
   error Paused_Actions();
