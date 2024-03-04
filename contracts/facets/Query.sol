@@ -4,6 +4,7 @@ pragma solidity 0.8.20;
 import { TStakePoolInfo, TStakeTierSection, TUser,TGame, TUserIpo,TGameIpo } from "../libraries/Structs.sol";
 import { LibStake } from "../libraries/LibStake.sol";
 import { LibGame } from "../libraries/LibGame.sol";
+import { IERC721Game } from "../interfaces/IERC721Game.sol";
 
 contract Query {
 
@@ -144,6 +145,45 @@ contract Query {
         returns (TUserIpo memory) 
     {
         return LibGame.layout().userIpo[_user][_id][_round];
+    }
+
+    struct SupportedCheckNFTs {
+        uint256 gameId;
+        uint256[] tokenIds;
+    }
+
+    function checkUserNFTs(
+        address _user
+    )
+        public 
+        view 
+        returns(SupportedCheckNFTs[] memory) 
+    {
+        LibGame.Layout storage gs = LibGame.layout();
+        uint256[] memory ids = gs.gameIds;
+        uint256 idsLength = ids.length;
+
+        SupportedCheckNFTs[] memory ownedNFTs = new SupportedCheckNFTs[](idsLength);
+
+        for(uint256 i = 0; i < idsLength;){
+            uint256 roundCount = gs.game[i].roundCount;
+            IERC721Game nft = IERC721Game(gs.game[i].nftContract);
+            
+            for(uint256 j = 0; j < roundCount;){
+
+                ownedNFTs[i].push({
+                    gameId: i,
+                    tokenIds: [j]
+                });
+                unchecked {
+                    j++;
+                }
+            }
+
+            unchecked {
+                i++;
+            }
+        }
     }
    
 }

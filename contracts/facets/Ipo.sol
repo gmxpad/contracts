@@ -80,7 +80,6 @@ contract Ipo is Modifiers, ReentrancyGuard{
         unchecked {
             gs.gameIpo[_id][_round].roundUserCount++;
             gs.gameIpo[_id][_round].collectedInvestment += _amount;
-            gs.userIpo[_user][_id][_round].investAmount += _amount;
         }
 
         uint256 multipler = calculateMultipler(_id,_round,_amount);
@@ -111,11 +110,10 @@ contract Ipo is Modifiers, ReentrancyGuard{
         if(!gs.game[gameId].isExist){ revert Invalid_Action(); }
         if(!gs.game[gameId].isIPO){ revert Invalid_Action(); }
         if(gs.userIpo[user][gameId][round].isRegister) { revert User_Already_Registered(); }
-        uint256 stakeScore = LibStake.layout().user[user].userTotalScore;
-        if(stakeScore == 0){revert User_Not_Stake();}
         if(blockTime < gs.gameIpo[gameId][round].registerStart) { revert Not_Started_Registration(); }
         if(blockTime > gs.gameIpo[gameId][round].registerEnd) { revert End_Registration(); }
-
+        uint256 stakeScore = LibStake.layout().user[user].userTotalScore;
+        if(stakeScore == 0){revert User_Not_Stake();}
         gs.userIpo[user][gameId][round].isRegister = true;
 
         unchecked {
@@ -136,7 +134,7 @@ contract Ipo is Modifiers, ReentrancyGuard{
         returns (uint256 mul) 
     {
         uint256 sharePrice =  LibGame.layout().gameIpo[_id][_round].perSharePrice;
-        if(_amount >= sharePrice){
+        if(_amount >= sharePrice) {
             uint256 decimals = (10 ** ISolidStateERC20(LibGame.layout().usedTokenAddress).decimals());
             mul = _amount.mulDiv(sharePrice,decimals);
         }
@@ -166,8 +164,9 @@ contract Ipo is Modifiers, ReentrancyGuard{
         }
     }
 
-    function stakeNFT(
+    function claimInvestmentShare(
         uint256 _id,
+        uint256 _round,
         uint256 _tokenId
     ) 
         external 
@@ -175,6 +174,7 @@ contract Ipo is Modifiers, ReentrancyGuard{
         whenNotContract(msg.sender) 
     {
         uint256 gameId = _id;
+        uint256 round = _round;
         uint256 tokenId = _tokenId;
         address user = msg.sender;
         LibGame.Layout storage gs = LibGame.layout();
@@ -183,62 +183,10 @@ contract Ipo is Modifiers, ReentrancyGuard{
         if(user != nft.ownerOf(tokenId)) { revert Insufficient_Balance(); }
         if(!nft.isApprovedForAll(user,address(this))) { revert Insufficient_Allowance(); }
 
-        if(!gs.gameStaker[user][gameId].isGameStaker) {
-            gs.gameStaker[user][gameId].isGameStaker = true;
-        }
-
-        unchecked {
-            gs.gameStaker[user][gameId].userGameMultipler += nft.getMultipler(tokenId);
-        }
-        
+        uint256 claimableAmount = calculateInvestmentShare(gameId,round,tokenId);
+        if(claimableAmount == 0) { revert Overflow_0x11(); }
+        nft.setNFTClaimed(tokenId);
         nft.burn(tokenId);
-        emit HANDLE_STAKE_IPO(user,gameId,tokenId,block.timestamp);
-    }
-
-    function unstakeNFT(
-        uint256 _id,
-        uint256 _outMultipler
-    ) 
-        external 
-        nonReentrant 
-        whenNotContract(msg.sender) 
-    {
-        uint256 gameId = _id;
-        uint256 outMultipler = _outMultipler;
-        address user = msg.sender;
-        LibGame.Layout storage gs = LibGame.layout();
-
-        if(!gs.gameStaker[user][gameId].isGameStaker){ revert User_Not_Stake(); }
-        if(outMultipler > gs.gameStaker[user][gameId].userGameMultipler) { revert Invalid_Input(); }
-        
-        unchecked {
-            gs.gameStaker[user][gameId].userGameMultipler -= outMultipler;
-        }
-
-        uint256 remainingMultipler = gs.gameStaker[user][gameId].userGameMultipler - outMultipler;
-        if(remainingMultipler == 0){ gs.gameStaker[user][gameId].isGameStaker = false; }
-
-        IERC721Game(gs.game[gameId].nftContract).safeMint(outMultipler,user);
-
-        emit HANDLE_UNSTAKE_IPO(user,gameId,block.timestamp);
-    }
-
-    function claimInvestmentShare(
-        uint256 _id
-    ) 
-        external 
-        nonReentrant 
-        whenNotContract(msg.sender) 
-    {
-        uint256 gameId = _id;
-        address user = msg.sender;
-        LibGame.Layout storage gs = LibGame.layout();
-
-        if(!gs.gameStaker[user][gameId].isGameStaker){ revert User_Not_Stake(); }
-
-        uint256 claimableAmount = calculateInvestmentShare(gameId,user);
-        if(claimableAmount == 0) { revert User_Not_Expired(); }
-
         ISolidStateERC20(gs.usedTokenAddress).transfer(user,claimableAmount);
 
         emit HANDLE_CLAIM_IPO(user,gameId,block.timestamp);
@@ -246,63 +194,27 @@ contract Ipo is Modifiers, ReentrancyGuard{
 
     function calculateInvestmentShare(
         uint256 _id,
-        address _user
-    )
+        uint256 _round,
+        uint256 _tokenId
+    ) 
         public 
         view 
         returns (uint256) 
     {
         uint256 gameId = _id;
-        address user = _user;
-        LibGame.Layout storage gs = LibGame.layout();
-
+        uint256 round = _round;
+        uint256 tokenId = _tokenId;
         uint256 investmentShare = 0;
-        if(!gs.gameStaker[user][gameId].isGameStaker){ return investmentShare; }
-        
-        // ...
 
+        LibGame.Layout storage gs = LibGame.layout();
+        IERC721Game nft = IERC721Game(gs.game[gameId].nftContract);
+
+        uint256 nftMultipler = nft.getMultipler(tokenId);
+        if(nftMultipler == 0) { return investmentShare; }
+        if(nft.getNFTClaimed(tokenId)) { return investmentShare; }
+        if(gs.gameIpo[gameId][round].dividendValue == 0) { return investmentShare; }
+        investmentShare = (nftMultipler * gs.gameIpo[gameId][round].dividendValue) / gs.gameIpo[gameId][round].roundScore;
         return investmentShare;
-    }
-
-    function onERC721Received(
-        address, 
-        address, 
-        uint256, 
-        bytes calldata
-    ) 
-        external 
-        pure 
-        returns (bytes4) 
-    {
-        return this.onERC721Received.selector;
-    }
-
-    function onERC1155Received(
-        address, 
-        address, 
-        uint256, 
-        uint256, 
-        bytes memory
-    ) 
-        public 
-        virtual 
-        returns(bytes4) 
-    {
-        return this.onERC1155Received.selector;
-    }
-
-    function onERC1155BatchReceived(
-        address, 
-        address, 
-        uint256[] memory, 
-        uint256[] memory, 
-        bytes memory
-    ) 
-        public 
-        virtual 
-        returns(bytes4) 
-    {
-        return this.onERC1155BatchReceived.selector;
     }
 
 }

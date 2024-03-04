@@ -129,4 +129,7 @@ interface IERC721Game {
     function burn(uint256 tokenId) external;
     function safeMint(uint256 mul,address to) external;
     function getMultipler(uint256 tokenId) external view returns (uint256); 
+    function getNFTClaimed(uint256 tokenId) external view returns (bool); 
+    function setNFTClaimed(uint256 tokenId) external; 
+
 }

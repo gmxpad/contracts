@@ -120,6 +120,7 @@ import { ItemType, EventType, EventRound } from "./Enums.sol";
 
         uint256 projectId;
         uint256 roundCount;
+        uint256[] rounds;
 
         address nftContract;
     }
@@ -152,20 +153,16 @@ import { ItemType, EventType, EventRound } from "./Enums.sol";
     struct TUserIpo {
         bool isInvestmentor;
         bool isRegister;
+        bool isClaimed;
 
-        uint256 investAmount;
         uint256 userRoundScore;
     }
 
-    struct TGameStaker {
-        bool isGameStaker;
-
-        uint256 userGameMultipler;
-        uint256[] claimedRounds;
-        uint256[] claimedRoundsAmounts;
+    struct TNFTInfo {
+        uint256 multipler;
+        string name;
+        string website;
+        string twitter;
+        string telegram;
+        string github;
     }
-
-
-
-    
-
